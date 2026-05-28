@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+  <title>佛说阿弥陀经 | 净土宗经典</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="佛说阿弥陀经全文，鸠摩罗什译本。净土宗必读经典，极乐世界庄严描述。">
+  <link rel="stylesheet" href="https://fonts.cloudflare.com/css?family=Noto+Serif+SC:400,700&display=swap">
+  <script src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #07080f;
+      --surface:   #0d0f1e;
+      --surface2:  #111324;
+      --gold:      #c8a030;
+      --gold-hi:   #f0d060;
+      --gold-lo:   #6a5218;
+      --text:      #ddd0b0;
+      --text-dim:  #8a7850;
+      --border:    rgba(180,140,40,0.18);
+      --border-hi: rgba(200,160,48,0.48);
+      --glow-col:  rgba(180,130,30,0.10);
+    }
+
+    body.light {
+      --bg:        #f7f3e8;
+      --surface:   #efead8;
+      --surface2:  #e7dfca;
+      --gold:      #7a5008;
+      --gold-hi:   #5a3804;
+      --gold-lo:   #b8900a;
+      --text:      #1e1506;
+      --text-dim:  #7a6030;
+      --border:    rgba(100,72,16,0.18);
+      --border-hi: rgba(100,72,16,0.40);
+      --glow-col:  rgba(180,130,30,0.06);
+    }
+
+    body {
+      font-family: "Noto Serif SC", serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 2;
+      min-height: 100vh;
+      transition: background 0.4s, color 0.4s;
+      overflow-x: hidden;
+    }
+
+    /* Central ambient glow */
+    .ambient {
+      position: fixed;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 500px;
+      background: radial-gradient(ellipse at 50% 30%, var(--glow-col) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Floating sparks */
+    #sparks {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .spark {
+      position: absolute;
+      bottom: 0;
+      border-radius: 50%;
+      background: var(--gold-hi);
+      opacity: 0;
+      animation: ascend linear infinite;
+    }
+
+    @keyframes ascend {
+      0%   { transform: translateY(0) translateX(0) scale(1);   opacity: 0; }
+      12%  { opacity: 0.55; }
+      88%  { opacity: 0.12; }
+      100% { transform: translateY(-90vh) translateX(var(--dx)) scale(0.2); opacity: 0; }
+    }
+
+    /* Layout */
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 0 28px 100px;
+    }
+
+    /* ── Hero ─────────────────────────────── */
+    .hero {
+      text-align: center;
+      padding: 110px 0 64px;
+    }
+
+    .rule {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 30px;
+    }
+
+    .rule::before, .rule::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to var(--dir, right), transparent, var(--gold-lo));
+    }
+    .rule::after { --dir: left; }
+
+    .rule-mark {
+      color: var(--gold-lo);
+      font-size: 0.85rem;
+      letter-spacing: 6px;
+      opacity: 0.7;
+    }
+
+    h1 {
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      font-weight: 700;
+      letter-spacing: 14px;
+      color: var(--gold-hi);
+      animation: pulse-glow 4s ease-in-out infinite alternate;
+      margin-bottom: 18px;
+      line-height: 1.25;
+    }
+
+    body.light h1 {
+      animation: none;
+      color: var(--gold-hi);
+    }
+
+    @keyframes pulse-glow {
+      from { text-shadow: 0 0 18px rgba(200,160,48,0.15); }
+      to   { text-shadow: 0 0 60px rgba(200,160,48,0.55), 0 0 100px rgba(200,160,48,0.20); }
+    }
+
+    .hero-sub {
+      font-size: 0.88rem;
+      color: var(--text-dim);
+      letter-spacing: 5px;
+    }
+
+    /* ── Controls ─────────────────────────── */
+    #ctrl {
+      position: fixed;
+      top: 20px; right: 20px;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 7px 14px;
+      background: rgba(6, 6, 14, 0.82);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-hi);
+      border-radius: 40px;
+      transition: background 0.4s, border-color 0.4s;
+    }
+
+    body.light #ctrl {
+      background: rgba(240, 234, 214, 0.90);
+    }
+
+    .cb {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-family: inherit;
+      font-size: 0.80rem;
+      letter-spacing: 2px;
+      padding: 5px 11px;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .cb:hover {
+      color: var(--gold-hi);
+      background: rgba(180,140,40,0.12);
+    }
+
+    .sep {
+      width: 1px;
+      height: 14px;
+      background: var(--border);
+      margin: 0 4px;
+    }
+
+    @media (max-width: 600px) {
+      #ctrl { top: 10px; right: 10px; padding: 5px 10px; }
+      .cb { font-size: 0.70rem; padding: 4px 8px; letter-spacing: 1px; }
+    }
+
+    /* ── Video ────────────────────────────── */
+    .video-frame {
+      position: relative;
+      border: 1px solid var(--border-hi);
+      border-radius: 6px;
+      overflow: hidden;
+      background: var(--surface);
+      margin-bottom: 48px;
+    }
+
+    .cover-wrap {
+      cursor: pointer;
+      display: block;
+      position: relative;
+    }
+
+    .cover-wrap img {
+      width: 100%;
+      display: block;
+      transition: filter 0.35s;
+    }
+
+    .cover-wrap:hover img { filter: brightness(1.08); }
+
+    .cover-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(4,4,10,0.38);
+      transition: background 0.3s;
+    }
+
+    .cover-wrap:hover .cover-overlay { background: rgba(4,4,10,0.22); }
+
+    .play-ring {
+      width: 68px; height: 68px;
+      border: 1.5px solid var(--gold);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 18px;
+      transition: transform 0.3s, border-color 0.3s;
+    }
+
+    .cover-wrap:hover .play-ring {
+      transform: scale(1.08);
+      border-color: var(--gold-hi);
+    }
+
+    .play-ring svg { fill: var(--gold); margin-left: 5px; }
+
+    .play-lbl {
+      font-size: 0.82rem;
+      color: var(--gold-hi);
+      letter-spacing: 5px;
+    }
+
+    #vid { width: 100%; display: none; }
+
+    /* ── Sutra ────────────────────────────── */
+    #sutra {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 56px 60px;
+    }
+
+    @media (max-width: 600px) {
+      #sutra { padding: 36px 24px; }
+    }
+
+    .sutra-lede {
+      text-align: center;
+      padding-bottom: 36px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 40px;
+    }
+
+    .sutra-lede .lede-label {
+      font-size: 0.80rem;
+      color: var(--text-dim);
+      letter-spacing: 4px;
+      line-height: 2.2;
+    }
+
+    .divider {
+      text-align: center;
+      margin: 36px 0;
+      color: var(--gold-lo);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      opacity: 0.55;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .divider span { font-size: 0.7rem; letter-spacing: 6px; }
+
+    .stxt {
+      font-size: 1.12rem;
+      line-height: 2.3;
+      color: var(--text);
+      text-align: justify;
+    }
+
+    .stxt p {
+      margin-bottom: 1.4em;
+      text-indent: 2.2em;
+    }
+
+    .stxt p.center {
+      text-indent: 0;
+      text-align: center;
+    }
+
+    .stxt p.heading {
+      text-indent: 0;
+      text-align: center;
+      color: var(--gold);
+      letter-spacing: 5px;
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin: 2em 0 1em;
+    }
+
+    .stxt p.verse {
+      text-indent: 0;
+      text-align: center;
+      color: var(--text-dim);
+      line-height: 2.6;
+    }
+
+    .stxt p.namo {
+      text-indent: 0;
+      text-align: center;
+      color: var(--gold);
+      letter-spacing: 6px;
+      font-size: 1.05rem;
+    }
+
+    /* Footer / closing verses */
+    .sutra-close {
+      margin-top: 52px;
+      padding-top: 36px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--text-dim);
+      line-height: 2.6;
+      font-size: 1rem;
+    }
+
+    .sutra-close .close-sec {
+      margin: 32px 0;
+    }
+
+    .sutra-close .sec-title {
+      color: var(--gold);
+      letter-spacing: 5px;
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 16px;
+    }
+
+    .sutra-close .dharani {
+      font-size: 0.88rem;
+      color: var(--text-dim);
+      line-height: 2.4;
+    }
+
+    .final-namo {
+      color: var(--gold-hi);
+      letter-spacing: 10px;
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-top: 36px;
+      display: block;
+    }
+
+    body.light .final-namo { color: var(--gold-hi); }
+  </style>
+</head>
+<body>
+
+<div class="ambient"></div>
+<div id="sparks"></div>
+
+<!-- Controls -->
+<nav id="ctrl">
+  <button class="cb" id="toggleLang">繁</button>
+  <div class="sep"></div>
+  <button class="cb" id="toggleMode">亮</button>
+  <div class="sep"></div>
+  <button class="cb" id="zoomIn">大</button>
+  <button class="cb" id="zoomOut">小</button>
+  <div class="sep"></div>
+  <button class="cb" id="shareLink">分享</button>
+</nav>
+
+<div class="page">
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="rule"><span class="rule-mark">✦ ✦ ✦</span></div>
+    <h1 id="mainTitle" data-s="佛说阿弥陀经" data-t="佛說阿彌陀經">佛说阿弥陀经</h1>
+    <div class="hero-sub">净土宗根本经典</div>
+    <div class="rule" style="margin-top:28px;margin-bottom:0;"><span class="rule-mark">✦</span></div>
+  </header>
+
+  <!-- Video -->
+  <div class="video-frame">
+    <div class="cover-wrap" id="cover">
+      <img src="https://pub-bfae9b39b66c495c8c35815699865b03.r2.dev/1.png" alt="佛说阿弥陀经封面">
+      <div class="cover-overlay">
+        <div class="play-ring">
+          <svg width="22" height="22" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        <div class="play-lbl" id="vidLabel" data-s="点击播放经文" data-t="點擊播放經文">点击播放经文</div>
+      </div>
+    </div>
+    <video id="vid" controls autoplay loop>
+      <source src="https://amtb.sun.edu.my/%E4%BD%9B%E8%AA%AA%E9%98%BF%E5%BD%8C%E9%99%80%E7%B6%93.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <!-- Sutra text -->
+  <article id="sutra">
+
+    <div class="sutra-lede">
+      <div class="lede-label">
+        姚秦 · 三藏法师 · 鸠摩罗什　奉诏译
+      </div>
+    </div>
+
+    <div class="stxt" id="sutraBody">
+
+      <p class="heading">开经偈</p>
+      <p class="verse">无上甚深微妙法　百千万劫难遭遇<br>我今见闻得受持　愿解如来真实义</p>
+
+      <p class="namo">南无莲池海会佛菩萨</p>
+      <p class="namo">南无莲池海会佛菩萨</p>
+      <p class="namo">南无莲池海会佛菩萨</p>
+
+      <div class="divider"><span>✦</span></div>
+
+      <p>如是我闻。</p>
+
+      <p>一时佛在舍卫国，祗树给孤独园。</p>
+
+      <p>与大比丘僧，千二百五十人俱，皆是大阿罗汉，众所知识：长老舍利弗、摩诃目犍连、摩诃迦叶、摩诃迦旃延、摩诃俱希罗、离婆多、周利盘陀伽、难陀、阿难陀、罗侯罗、乔梵波提、宾头卢颇罗堕、迦留陀夷、摩诃劫宾那、薄拘罗、阿那楼陀，如是等诸大弟子。并诸菩萨摩诃萨：文殊师利法王子、阿逸多菩萨、乾陀诃提菩萨、常精进菩萨，与如是等诸大菩萨。</p>
+
+      <p>及释提桓因等，无量诸天大众俱。</p>
+
+      <p>尔时，佛告长老舍利弗：「从是西方，过十万亿佛土有世界名曰极乐，其土有佛，号阿弥陀，今现在说法。」</p>
+
+      <p>「舍利弗，彼土何故名为极乐？其国众生，无有众苦，但受诸乐，故名极乐。」</p>
+
+      <p>「又舍利弗。极乐国土，七重栏循，七重罗网，七重行树，皆是四宝，周匝围绕，是故彼国名为极乐。」</p>
+
+      <p>「又舍利弗。极乐国土，有七宝池，八功德水，充满其中，池底纯以金沙布地。四边阶道，金银、琉璃、玻璃合成。上有楼阁，亦以金银、琉璃、玻璃、砗磲、赤珠、玛瑙而严饰之。池中莲花大如车轮，青色、青光、黄色、黄光、赤色、赤光、白色、白光，微妙香洁。」</p>
+
+      <p>「舍利弗。极乐国土，成就如是功德庄严。」</p>
+
+      <p>「又舍利弗。彼佛国土，常作天乐。黄金为地。昼夜六时，天雨曼陀罗华。其土众生，常以清旦，各以衣绒盛众妙华，供养他方十万亿佛，即以食时，还到本国，饭食经行。」</p>
+
+      <p>「舍利弗。极乐国土，成就如是功德庄严。」</p>
+
+      <p>复次舍利弗：「彼国常有种种奇妙杂色之鸟：白鹤、孔雀、鹦鹉、舍利、迦陵频伽、共命之鸟。是诸众鸟，昼夜六时，出和雅音。其音演畅五根、五力、七菩提分、八圣道分，如是等法。其土众生，闻是音已，皆悉念佛、念法、念僧。」</p>
+
+      <p>「舍利弗。汝勿谓此鸟，实是罪报所生，所以者何？彼佛国土，无三恶道。」</p>
+
+      <p>「舍利弗。其佛国土，尚无三恶道之名，何况有实。是诸众鸟，皆是阿弥陀佛，欲令法音宣流，变化所作。」</p>
+
+      <p>「舍利弗。彼佛国土，微风吹动诸宝行树，及宝罗网，出微妙音，譬如百千种乐，同时俱作。闻是音者，自然皆生念佛、念法、念僧之心。」</p>
+
+      <p>「舍利弗。其佛国土，成就如是功德庄严。」</p>
+
+      <div class="divider"><span>✦</span></div>
+
+      <p>「舍利弗。于汝意云何？彼佛何故号阿弥陀？」</p>
+
+      <p>「舍利弗。彼佛光明无量，照十方国，无所障碍，是故号为阿弥陀。」</p>
+
+      <p>「又舍利弗。彼佛寿命，及其人民，无量无边阿僧只劫，故名阿弥陀。」</p>
+
+      <p>「舍利弗。阿弥陀成佛已来，于今十劫。」</p>
+
+      <p>「又舍利弗。彼佛有无量无边声闻弟子，皆阿罗汉，非是算数之所能知。诸菩萨众，亦复如是。」</p>
+
+      <p>「舍利弗。彼佛国土，成就如是功德庄严。」</p>
+
+      <p>「又舍利弗。极乐国土，众生生者，皆是阿裨跋致，其中多有一生补处，其数甚多，非是算数所能知之，但可以无量无边阿僧只说。」</p>
+
+      <p>「舍利弗。众生闻者，应当发愿，愿生彼国，所以者何？得与如是诸上善人俱会一处。」</p>
+
+      <p>「舍利弗。不可以少善根福德因缘，得生彼国。」</p>
+
+      <div class="divider"><span>✦</span></div>
+
+      <p>「舍利弗。若有善男子善女人，闻说阿弥陀佛，执持名号，若一日、若二日，若三日，若四日，若五日、若六日、若七日，一心不乱，其人临命终时，阿弥陀佛，与诸圣众，现在其前。是人终时，心不颠倒，即得往生阿弥陀佛极乐国土。」</p>
+
+      <p>「舍利弗。我见是利，故说此言。若有众生，闻是说者，应当发愿，生彼国土。」</p>
+
+      <div class="divider"><span>✦</span></div>
+
+      <p>「舍利弗。如我今者，赞叹阿弥陀佛，不可思议功德之利。东方亦有阿閦裨佛、须弥相佛、大须弥佛、须弥光佛、妙音佛，如是等恒河沙数诸佛，各于其国，出广长舌相，遍覆三千大千世界，说诚实言：『汝等众生，当信是称赞不可思议功德一切诸佛所护念经。』」</p>
+
+      <p>「舍利弗。南方世界，有：日月灯佛、名闻光佛、大焰肩佛、须弥灯佛、无量精进佛，如是等恒河沙数诸佛，各于其国，出广长舌相，遍覆三千大千世界，说诚实言：『汝等众生，当信是称赞不可思议功德一切诸佛所护念经。』」</p>
+
+      <p>「舍利弗。西方世界，有：无量寿佛、无量相佛、无量幢佛、大光佛、大明佛、宝相佛、净光佛，如是等恒河沙数诸佛，各于其国，出广长舌相，遍覆三千大千世界，说诚实言：『汝等众生，当信是称赞不可思议功德一切诸佛所护念经。』」</p>
+
+      <p>「舍利弗。北方世界，有：焰肩佛、最胜音佛、难沮佛、日生佛、网明佛，如是等恒河沙数诸佛，各于其国，出广长舌相，遍覆三千大千世界，说诚实言：『汝等众生，当信是称赞不可思议功德一切诸佛所护念经。』」</p>
+
+      <p>「舍利弗。下方世界，有：师子佛、名闻佛、名光佛、达摩佛、法幢佛、持法佛，如是等恒河沙数诸佛，各于其国，出广长舌相，遍覆三千大千世界，说诚实言：『汝等众生，当信是称赞不可思议功德一切诸佛所护念经。』」</p>
+
+      <p>「舍利弗。上方世界，有：梵音佛、宿王佛、香上佛、香光佛、大焰肩佛、杂色宝华严身佛、娑罗树王佛、宝华德佛、见一切义佛、如须弥山佛，如是等恒河沙数诸佛，各于其国，出广长舌相，遍覆三千大千世界，说诚实言：『汝等众生，当信是称赞不可思议功德一切诸佛所护念经。』」</p>
+
+      <div class="divider"><span>✦</span></div>
+
+      <p>「舍利弗。于汝意云何？何故名为一切诸佛所护念经？」</p>
+
+      <p>「舍利弗。若有善男子、善女人，闻是经受持者，及闻诸佛名者，是诸善男子、善女人，皆为一切诸佛之所护念，皆得不退转于阿耨多罗三藐三菩提。是故舍利弗，汝等皆当信受我语，及诸佛所说。」</p>
+
+      <p>「舍利弗。若有人已发愿、今发愿、当发愿，欲生阿弥陀佛国者，是诸人等，皆得不退转于阿耨多罗三藐三菩提，于彼国土，若已生、若今生、若当生。是故舍利弗，诸善男子、善女人，若有信者，应当发愿生彼国土。舍利弗，如我今者，称赞诸佛不可思议功德，彼诸佛等，亦称赞我不可思议功德，而作是言：『释迦牟尼佛能为甚难悉有之事，能于娑婆国土，五浊恶世，劫浊、见浊、烦恼浊、众生浊、命浊中，得阿耨多罗三藐三菩提。为诸众生，说是一切世间难信之法。』」</p>
+
+      <p>「舍利弗。当知我于五浊恶世，行此难事，得阿耨多罗三藐三菩提，为一切世间说此难信之法，是为甚难。」</p>
+
+      <p>佛说此经已，舍利弗，及诸比丘，一切世间天人阿修罗等，闻佛所说，欢喜信受，作礼而去。</p>
+
+      <p>佛说是经已，长老舍利弗，诸比丘，诸天、世人、阿修罗等，闻佛所说，皆大欢喜，信受奉行。</p>
+
+    </div><!-- .stxt -->
+
+    <!-- Closing verses -->
+    <footer class="sutra-close">
+
+      <div class="divider" style="margin-top:0;"><span>✦</span></div>
+
+      <div class="close-sec">
+        <div class="sec-title">赞佛偈</div>
+        <p>阿弥陀佛身金色，相好光明无等伦，白毫宛转五须弥，绀目澄清四大海，</p>
+        <p>光中化佛无数亿，化菩萨众亦无边，四十八愿度众生，九品咸令登彼岸。</p>
+        <p style="margin-top:14px; color:var(--gold); letter-spacing:4px; font-size:0.95rem;">
+          南无阿弥陀佛　南无观世音菩萨　南无大势至菩萨　南无清净大海众菩萨
+        </p>
+      </div>
+
+      <div class="divider"><span>✦</span></div>
+
+      <div class="close-sec">
+        <div class="sec-title">莲池赞</div>
+        <p>莲池海会，弥陀如来，观音势至坐莲台，接引上金阶，大誓弘开，普愿离尘埃。</p>
+        <p style="margin-top:14px; color:var(--gold); letter-spacing:4px; font-size:0.95rem;">
+          南无莲池海会佛菩萨　南无莲池海会佛菩萨　南无莲池海会佛菩萨
+        </p>
+      </div>
+
+      <div class="divider"><span>✦</span></div>
+
+      <div class="close-sec">
+        <div class="sec-title">发愿偈</div>
+        <p>愿生西方净土中，九品莲华为父母，华开见佛悟无生，不退菩萨为伴侣。</p>
+        <p class="dharani" style="margin-top:16px;">
+          拔一切业障根本得生净土陀罗尼<br>
+          南无阿弥多婆夜，哆他伽哆夜，哆地夜他，阿弥唎都婆毗，阿弥唎哆，悉耽婆毗，<br>
+          阿弥唎哆，毗迦兰帝，阿弥唎哆　毗迦兰哆，伽弥腻，伽伽那，枳多迦隶，娑婆诃。
+        </p>
+      </div>
+
+      <div class="divider"><span>✦</span></div>
+
+      <p>愿以此功德，庄严佛净土。上报四重恩，下济三途苦。</p>
+      <p>若有见闻者，悉发菩提心。尽此一报身，同生极乐国。</p>
+
+      <span class="final-namo">南无阿弥陀佛</span>
+
+    </footer>
+
+  </article>
+</div><!-- .page -->
+
+<script>
+(function () {
+  // ── Sparks ───────────────────────────────────────────────
+  const sparksEl = document.getElementById('sparks');
+  const SPARK_COUNT = 22;
+  for (let i = 0; i < SPARK_COUNT; i++) {
+    const s = document.createElement('div');
+    s.className = 'spark';
+    const size = Math.random() * 2.5 + 1;
+    s.style.cssText = [
+      'left:' + (Math.random() * 100) + '%',
+      'width:' + size + 'px',
+      'height:' + size + 'px',
+      '--dx:' + ((Math.random() - 0.5) * 60) + 'px',
+      'animation-duration:' + (Math.random() * 14 + 10) + 's',
+      'animation-delay:' + (Math.random() * 16) + 's'
+    ].join(';');
+    sparksEl.appendChild(s);
+  }
+
+  // ── State ───────────────────────────────────────────────
+  let lang = localStorage.getItem('lang') || 'simplified';
+  let light = localStorage.getItem('theme') === 'light';
+  let savedSize = localStorage.getItem('fontSize');
+
+  const mainTitle  = document.getElementById('mainTitle');
+  const vidLabel   = document.getElementById('vidLabel');
+  const sutraBody  = document.getElementById('sutraBody');
+  const sutra      = document.getElementById('sutra');
+  const toggleLang = document.getElementById('toggleLang');
+  const toggleMode = document.getElementById('toggleMode');
+  const zoomIn     = document.getElementById('zoomIn');
+  const zoomOut    = document.getElementById('zoomOut');
+  const shareLink  = document.getElementById('shareLink');
+  const cover      = document.getElementById('cover');
+  const vid        = document.getElementById('vid');
+
+  // ── OpenCC converters ───────────────────────────────────
+  let toTW = null, toCN = null;
+  let origHTML = '';
+
+  function initCC() {
+    if (typeof OpenCC === 'undefined') { setTimeout(initCC, 120); return; }
+    toTW = OpenCC.Converter({ from: 'cn', to: 'tw' });
+    toCN = OpenCC.Converter({ from: 'tw', to: 'cn' });
+    origHTML = sutraBody.innerHTML;
+    applyLang();
+  }
+
+  function applyLang() {
+    if (!toTW) return;
+    if (lang === 'traditional') {
+      sutraBody.innerHTML = toTW(origHTML);
+      mainTitle.textContent = mainTitle.getAttribute('data-t');
+      vidLabel.textContent  = vidLabel.getAttribute('data-t');
+      toggleLang.textContent = '简';
+    } else {
+      sutraBody.innerHTML = origHTML;
+      mainTitle.textContent = mainTitle.getAttribute('data-s');
+      vidLabel.textContent  = vidLabel.getAttribute('data-s');
+      toggleLang.textContent = '繁';
+    }
+  }
+
+  initCC();
+
+  toggleLang.addEventListener('click', function () {
+    if (lang === 'traditional' && toCN) {
+      origHTML = toCN(sutraBody.innerHTML);
+    } else if (lang === 'simplified') {
+      origHTML = sutraBody.innerHTML;
+    }
+    lang = lang === 'simplified' ? 'traditional' : 'simplified';
+    localStorage.setItem('lang', lang);
+    applyLang();
+  });
+
+  // ── Theme ───────────────────────────────────────────────
+  function applyTheme() {
+    document.body.classList.toggle('light', light);
+    toggleMode.textContent = light ? '暗' : '亮';
+  }
+
+  applyTheme();
+
+  toggleMode.addEventListener('click', function () {
+    light = !light;
+    localStorage.setItem('theme', light ? 'light' : 'dark');
+    applyTheme();
+  });
+
+  // ── Font size ───────────────────────────────────────────
+  if (savedSize) sutraBody.style.fontSize = savedSize;
+
+  zoomIn.addEventListener('click', function () {
+    let s = parseFloat(getComputedStyle(sutraBody).fontSize) + 1;
+    if (s > 38) s = 38;
+    sutraBody.style.fontSize = s + 'px';
+    localStorage.setItem('fontSize', s + 'px');
+  });
+
+  zoomOut.addEventListener('click', function () {
+    let s = parseFloat(getComputedStyle(sutraBody).fontSize) - 1;
+    if (s < 12) s = 12;
+    sutraBody.style.fontSize = s + 'px';
+    localStorage.setItem('fontSize', s + 'px');
+  });
+
+  // ── Video ───────────────────────────────────────────────
+  cover.addEventListener('click', function () {
+    cover.style.display = 'none';
+    vid.style.display = 'block';
+    vid.play().catch(function(){});
+  });
+
+  // ── Share ───────────────────────────────────────────────
+  shareLink.addEventListener('click', async function () {
+    const url = 'https://www.amtb.cc';
+    try {
+      await navigator.clipboard.writeText(url);
+      alert('链接已复制：' + url);
+    } catch (e) {
+      alert('请手动复制：' + url);
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
